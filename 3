@@ -1,0 +1,400 @@
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/styles.css b/styles.css
+new file mode 100644
+index 0000000000000000000000000000000000000000..a10e6909ff3e7255cd60f055a1fbeb18a9818326
+--- /dev/null
++++ b/styles.css
+@@ -0,0 +1,390 @@
++:root {
++  color-scheme: light;
++  --bg: #f7f4f0;
++  --card: #ffffff;
++  --ink: #1b1b1b;
++  --muted: #6f6b67;
++  --accent: #b87b5a;
++  --accent-dark: #7a4d37;
++  --shadow: 0 20px 40px rgba(26, 21, 18, 0.1);
++  --radius: 20px;
++  font-family: "Inter", sans-serif;
++}
++
++* {
++  box-sizing: border-box;
++}
++
++body {
++  margin: 0;
++  background: var(--bg);
++  color: var(--ink);
++}
++
++.app {
++  max-width: 1200px;
++  margin: 0 auto;
++  padding: 32px 20px 80px;
++}
++
++.hero {
++  display: flex;
++  flex-direction: column;
++  gap: 24px;
++  margin-bottom: 32px;
++}
++
++.eyebrow {
++  text-transform: uppercase;
++  font-size: 12px;
++  letter-spacing: 0.2em;
++  color: var(--muted);
++  margin: 0;
++}
++
++h1 {
++  font-family: "Playfair Display", serif;
++  font-size: 48px;
++  margin: 8px 0 12px;
++}
++
++.subtitle {
++  max-width: 600px;
++  color: var(--muted);
++  margin: 0;
++  font-size: 16px;
++}
++
++.nav-tabs {
++  display: flex;
++  gap: 12px;
++  flex-wrap: wrap;
++}
++
++.tab {
++  border: 1px solid transparent;
++  background: #ece7e1;
++  padding: 10px 18px;
++  border-radius: 999px;
++  font-weight: 600;
++  cursor: pointer;
++}
++
++.tab.active {
++  background: var(--ink);
++  color: white;
++}
++
++.tab-panel {
++  display: none;
++  flex-direction: column;
++  gap: 24px;
++}
++
++.tab-panel.active {
++  display: flex;
++}
++
++.panel-grid {
++  display: grid;
++  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
++  gap: 24px;
++}
++
++.card {
++  background: var(--card);
++  padding: 24px;
++  border-radius: var(--radius);
++  box-shadow: var(--shadow);
++  display: flex;
++  flex-direction: column;
++  gap: 16px;
++}
++
++.section-header {
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++  gap: 16px;
++  flex-wrap: wrap;
++}
++
++label {
++  display: flex;
++  flex-direction: column;
++  gap: 8px;
++  font-size: 14px;
++  color: var(--muted);
++}
++
++input,
++select {
++  padding: 10px 12px;
++  border-radius: 12px;
++  border: 1px solid #e0dbd5;
++  font-size: 14px;
++}
++
++button {
++  border: none;
++  border-radius: 999px;
++  padding: 10px 18px;
++  cursor: pointer;
++  font-weight: 600;
++  font-size: 14px;
++}
++
++button.primary {
++  background: var(--accent);
++  color: white;
++}
++
++button.primary:hover {
++  background: var(--accent-dark);
++}
++
++button.secondary {
++  background: #efe6de;
++  color: var(--ink);
++}
++
++button.ghost {
++  background: transparent;
++  border: 1px solid #d9d3cc;
++}
++
++.upload-zone {
++  display: flex;
++  gap: 12px;
++  align-items: center;
++  flex-wrap: wrap;
++}
++
++.upload-zone input {
++  display: none;
++}
++
++.hint {
++  font-size: 12px;
++  color: var(--muted);
++}
++
++.tag-selectors {
++  display: grid;
++  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
++  gap: 12px;
++}
++
++.search-row {
++  display: flex;
++  gap: 12px;
++  flex-wrap: wrap;
++}
++
++.web-results,
++.wardrobe-grid,
++.pin-grid,
++.planned-grid {
++  display: grid;
++  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
++  gap: 16px;
++}
++
++.wardrobe-item {
++  background: #f8f5f2;
++  border-radius: 16px;
++  padding: 12px;
++  display: flex;
++  flex-direction: column;
++  gap: 8px;
++  text-align: center;
++}
++
++.wardrobe-item img {
++  width: 100%;
++  border-radius: 12px;
++  object-fit: cover;
++  height: 140px;
++}
++
++.pill {
++  display: inline-flex;
++  background: #f1e5dc;
++  padding: 4px 10px;
++  border-radius: 999px;
++  font-size: 12px;
++  color: var(--accent-dark);
++}
++
++.swipe-card {
++  display: grid;
++  grid-template-columns: 1fr 1fr;
++  gap: 16px;
++  align-items: center;
++}
++
++.swipe-card img {
++  width: 100%;
++  height: 220px;
++  object-fit: cover;
++  border-radius: 20px;
++}
++
++.swipe-meta {
++  display: flex;
++  flex-direction: column;
++  gap: 8px;
++  font-weight: 600;
++}
++
++.pin-swipe {
++  display: flex;
++  align-items: center;
++  gap: 12px;
++}
++
++.pin-frame {
++  flex: 1;
++}
++
++.pin {
++  background: #fafafa;
++  border-radius: 24px;
++  padding: 18px;
++  display: flex;
++  flex-direction: column;
++  gap: 12px;
++  box-shadow: var(--shadow);
++}
++
++.pin-header {
++  display: flex;
++  justify-content: space-between;
++  font-weight: 600;
++}
++
++.pin-board {
++  color: var(--muted);
++  font-size: 12px;
++}
++
++.pin-collage {
++  display: grid;
++  grid-template-columns: repeat(3, 1fr);
++  gap: 8px;
++}
++
++.pin-collage img {
++  width: 100%;
++  border-radius: 14px;
++  object-fit: cover;
++  height: 110px;
++}
++
++.pin-footer {
++  display: flex;
++  flex-direction: column;
++  gap: 6px;
++  font-size: 13px;
++  color: var(--muted);
++}
++
++.calendar-grid {
++  display: grid;
++  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
++  gap: 16px;
++}
++
++.calendar-day {
++  background: #f1e5dc;
++  border-radius: 16px;
++  padding: 12px;
++  display: flex;
++  flex-direction: column;
++  gap: 8px;
++  cursor: pointer;
++}
++
++.calendar-day strong {
++  font-weight: 600;
++}
++
++.create-controls {
++  display: grid;
++  gap: 12px;
++}
++
++.wardrobe-select {
++  display: grid;
++  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
++  gap: 12px;
++}
++
++.wardrobe-select button {
++  border-radius: 16px;
++  padding: 0;
++  border: 1px solid transparent;
++  overflow: hidden;
++  background: #f5f1ed;
++}
++
++.wardrobe-select button.selected {
++  border-color: var(--accent);
++  box-shadow: 0 0 0 3px rgba(184, 123, 90, 0.3);
++}
++
++.wardrobe-select img {
++  width: 100%;
++  height: 120px;
++  object-fit: cover;
++}
++
++.modal {
++  position: fixed;
++  inset: 0;
++  background: rgba(18, 15, 13, 0.65);
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  padding: 20px;
++  z-index: 50;
++}
++
++.modal.hidden {
++  display: none;
++}
++
++.modal-content {
++  background: var(--card);
++  padding: 28px;
++  border-radius: 24px;
++  max-width: 520px;
++  width: 100%;
++  display: flex;
++  flex-direction: column;
++  gap: 16px;
++}
++
++.modal-actions {
++  display: flex;
++  gap: 12px;
++  flex-wrap: wrap;
++}
++
++.full {
++  width: 100%;
++}
++
++.calendar-swipe {
++  margin-top: 12px;
++}
++
++@media (max-width: 720px) {
++  .swipe-card {
++    grid-template-columns: 1fr;
++  }
++
++  h1 {
++    font-size: 38px;
++  }
++}
+ 
+EOF
+)
