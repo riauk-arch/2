@@ -6,106 +6,58 @@
     <title>PinWardrobe Studio</title>
     <link rel="stylesheet" href="styles.css" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
   </head>
   <body>
-    <div class="app">
-      <header class="hero">
-        <div>
-          <p class="eyebrow">Wardrobe + Pinterest inspiration</p>
-          <h1>PinWardrobe Studio</h1>
-          <p class="subtitle">
-            Upload your closet, remix Pinterest-inspired looks, and plan outfits
-            on a calendar.
-          </p>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="logo">
+          <span class="logo-mark">✦</span>
+          <div>
+            <p class="logo-title">PinWardrobe</p>
+            <p class="logo-sub">Studio Dashboard</p>
+          </div>
         </div>
-        <nav class="nav-tabs">
-          <button class="tab active" data-tab="wardrobe">Wardrobe</button>
-          <button class="tab" data-tab="pins">Generate Pins</button>
-          <button class="tab" data-tab="calendar">Calendar Plan</button>
-          <button class="tab" data-tab="create">Create Outfit</button>
+        <nav class="sidebar-nav">
+          <button class="nav-link active" data-section="start">Start</button>
+          <button class="nav-link" data-section="wardrobe">Wardrobe</button>
+          <button class="nav-link" data-section="pins">Pin Lab</button>
+          <button class="nav-link" data-section="calendar">Planner</button>
+          <button class="nav-link" data-section="create">Create</button>
         </nav>
-      </header>
-
-      <section class="tab-panel active" id="wardrobe">
-        <div class="panel-grid">
-          <div class="card">
-            <h2>Upload wardrobe</h2>
-            <p>
-              Add multiple items at once. Confirm accurate color + category tags
-              so outfits stay consistent.
-            </p>
-            <div class="upload-zone">
-              <input
-                type="file"
-                id="upload-input"
-                multiple
-                accept="image/*"
-              />
-              <button class="primary" id="upload-trigger">
-                Upload images
-              </button>
-              <span class="hint">PNG, JPG, WebP supported.</span>
-            </div>
-            <div class="tag-selectors">
-              <label>
-                Category
-                <select id="upload-category">
-                  <option value="top">Top</option>
-                  <option value="bottom">Bottom</option>
-                  <option value="dress">Dress</option>
-                  <option value="outerwear">Outerwear</option>
-                  <option value="shoe">Shoes</option>
-                  <option value="accessory">Accessory</option>
-                </select>
-              </label>
-              <label>
-                Color
-                <select id="upload-color">
-                  <option value="black">Black</option>
-                  <option value="white">White</option>
-                  <option value="cream">Cream</option>
-                  <option value="brown">Brown</option>
-                  <option value="tan">Tan</option>
-                  <option value="red">Red</option>
-                  <option value="blue">Blue</option>
-                  <option value="green">Green</option>
-                  <option value="pink">Pink</option>
-                  <option value="metallic">Metallic</option>
-                </select>
-              </label>
-            </div>
-          </div>
-
-          <div class="card">
-            <h2>Search the web</h2>
-            <p>
-              Find inspiration pieces online and save them directly to your
-              wardrobe.
-            </p>
-            <div class="search-row">
-              <input
-                type="text"
-                id="web-search"
-                placeholder="Search web: 'brown leather jacket'"
-              />
-              <button class="secondary" id="web-search-btn">Search</button>
-            </div>
-            <div class="web-results" id="web-results"></div>
-          </div>
+        <div class="sidebar-card">
+          <p class="eyebrow">Today’s focus</p>
+          <h3>Build 3 new outfits</h3>
+          <p>Use your saved tops + denim for quick looks.</p>
+          <button class="primary" id="jump-pins">Go to Pin Lab</button>
         </div>
+      </aside>
 
-        <div class="card">
-          <div class="section-header">
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Pinterest-inspired outfit planning</p>
+            <h1>PinWardrobe Studio</h1>
+          </div>
+          <div class="topbar-actions">
+            <input
+              type="search"
+              class="global-search"
+              placeholder="Search your closet or pins"
+            />
+            <button class="ghost">Export lookbook</button>
+          </div>
+        </header>
+
+        <section class="panel" id="start">
+          <div class="panel-header">
             <div>
-              <h2>Swipe through closet finds</h2>
-              <p>
-                Swipe (or tap) left/right to add items to your wardrobe list.
-              </p>
+              <h2>Step 1 · Style warmup</h2>
+              <p>Pick a style direction and start swiping new wardrobe ideas.</p>
             </div>
-            <div class="swipe-actions">
+            <div class="panel-actions">
               <button class="ghost" id="skip-item">Skip</button>
               <button class="primary" id="add-item">Add to wardrobe</button>
             </div>
@@ -115,98 +67,223 @@
             <div class="swipe-meta">
               <span id="swipe-name"></span>
               <span class="pill" id="swipe-tags"></span>
+              <div class="swipe-hint">
+                <span>Use ← or → to swipe</span>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="card">
-          <h2>Your wardrobe</h2>
-          <div class="wardrobe-grid" id="wardrobe-grid"></div>
-        </div>
-      </section>
-
-      <section class="tab-panel" id="pins">
-        <div class="panel-grid">
-          <div class="card">
-            <h2>Generate outfit pins</h2>
-            <p>
-              Select a Pinterest board style, then remix outfits from your
-              wardrobe.
-            </p>
-            <label>
-              Inspiration board
-              <select id="board-select">
-                <option value="london">London girl</option>
-                <option value="minimal">Minimal city</option>
-                <option value="maximalist">Maximalist glam</option>
-                <option value="coastal">Coastal linen</option>
-              </select>
-            </label>
-            <label>
-              Style direction
-              <input
-                type="text"
-                id="style-notes"
-                placeholder="e.g. espresso tones, chunky jewelry"
-              />
-            </label>
-            <button class="primary" id="generate-pins">Generate pins</button>
-          </div>
-          <div class="card">
-            <h2>Swipe outfit pins</h2>
-            <p>Tap the arrows to swipe through your generated pins.</p>
-            <div class="pin-swipe">
-              <button class="ghost" id="pin-prev">◀</button>
-              <div class="pin-frame" id="pin-frame"></div>
-              <button class="ghost" id="pin-next">▶</button>
+        <section class="panel" id="wardrobe">
+          <div class="panel-header">
+            <div>
+              <h2>Wardrobe vault</h2>
+              <p>Upload multiple items, tag them accurately, and filter fast.</p>
             </div>
           </div>
-        </div>
-      </section>
+          <div class="panel-grid">
+            <div class="card">
+              <h3>Upload wardrobe</h3>
+              <p>Add multiple items at once with precise color + category tags.</p>
+              <div class="upload-zone">
+                <input
+                  type="file"
+                  id="upload-input"
+                  multiple
+                  accept="image/*"
+                />
+                <button class="primary" id="upload-trigger">
+                  Upload images
+                </button>
+                <span class="hint">PNG, JPG, WebP supported.</span>
+              </div>
+              <div class="tag-selectors">
+                <label>
+                  Category
+                  <select id="upload-category">
+                    <option value="top">Top</option>
+                    <option value="bottom">Bottom</option>
+                    <option value="dress">Dress</option>
+                    <option value="outerwear">Outerwear</option>
+                    <option value="shoe">Shoes</option>
+                    <option value="accessory">Accessory</option>
+                  </select>
+                </label>
+                <label>
+                  Color
+                  <select id="upload-color">
+                    <option value="black">Black</option>
+                    <option value="white">White</option>
+                    <option value="cream">Cream</option>
+                    <option value="brown">Brown</option>
+                    <option value="tan">Tan</option>
+                    <option value="red">Red</option>
+                    <option value="blue">Blue</option>
+                    <option value="green">Green</option>
+                    <option value="pink">Pink</option>
+                    <option value="metallic">Metallic</option>
+                  </select>
+                </label>
+              </div>
+            </div>
 
-      <section class="tab-panel" id="calendar">
-        <div class="card">
-          <h2>Calendar outfit plan</h2>
-          <p>
-            Plan outfits in advance using saved pins or generate a new look for
-            each day.
-          </p>
-          <div class="calendar-grid" id="calendar-grid"></div>
-        </div>
-        <div class="card">
-          <h2>Planned outfits</h2>
-          <div class="planned-grid" id="planned-grid"></div>
-        </div>
-      </section>
-
-      <section class="tab-panel" id="create">
-        <div class="panel-grid">
-          <div class="card">
-            <h2>Create your own outfit pin</h2>
-            <p>Pick pieces from your closet to build a custom pin.</p>
-            <div class="create-controls">
-              <label>
-                Outfit title
-                <input type="text" id="custom-title" placeholder="Night out" />
-              </label>
-              <label>
-                Notes
+            <div class="card">
+              <h3>Search the web</h3>
+              <p>Find inspiration online and add it to your wardrobe vault.</p>
+              <div class="search-row">
                 <input
                   type="text"
-                  id="custom-notes"
-                  placeholder="e.g. monochrome, sleek accessories"
+                  id="web-search"
+                  placeholder="Search web: 'brown leather jacket'"
+                />
+                <button class="secondary" id="web-search-btn">Search</button>
+              </div>
+              <div class="web-results" id="web-results"></div>
+            </div>
+          </div>
+
+          <div class="card filter-card">
+            <div class="filter-row">
+              <input
+                type="search"
+                id="wardrobe-search"
+                placeholder="Filter wardrobe by keyword"
+              />
+              <select id="wardrobe-filter-color">
+                <option value="all">All colors</option>
+                <option value="black">Black</option>
+                <option value="white">White</option>
+                <option value="cream">Cream</option>
+                <option value="brown">Brown</option>
+                <option value="tan">Tan</option>
+                <option value="red">Red</option>
+                <option value="blue">Blue</option>
+                <option value="green">Green</option>
+                <option value="pink">Pink</option>
+                <option value="metallic">Metallic</option>
+              </select>
+              <select id="wardrobe-filter-category">
+                <option value="all">All categories</option>
+                <option value="top">Top</option>
+                <option value="bottom">Bottom</option>
+                <option value="dress">Dress</option>
+                <option value="outerwear">Outerwear</option>
+                <option value="shoe">Shoes</option>
+                <option value="accessory">Accessory</option>
+              </select>
+            </div>
+            <div class="wardrobe-grid" id="wardrobe-grid"></div>
+          </div>
+        </section>
+
+        <section class="panel" id="pins">
+          <div class="panel-header">
+            <div>
+              <h2>Pin lab</h2>
+              <p>Generate Pinterest-style pins and swipe through the results.</p>
+            </div>
+          </div>
+          <div class="panel-grid">
+            <div class="card">
+              <h3>Generate outfit pins</h3>
+              <label>
+                Inspiration board
+                <select id="board-select">
+                  <option value="london">London girl</option>
+                  <option value="minimal">Minimal city</option>
+                  <option value="maximalist">Maximalist glam</option>
+                  <option value="coastal">Coastal linen</option>
+                </select>
+              </label>
+              <label>
+                Style direction
+                <input
+                  type="text"
+                  id="style-notes"
+                  placeholder="e.g. espresso tones, chunky jewelry"
                 />
               </label>
+              <label>
+                Mood intensity
+                <input type="range" id="style-intensity" min="1" max="5" value="3" />
+                <span class="range-label" id="intensity-label">Balanced</span>
+              </label>
+              <button class="primary" id="generate-pins">Generate pins</button>
             </div>
-            <div class="wardrobe-select" id="wardrobe-select"></div>
-            <button class="primary" id="create-pin">Create pin</button>
+            <div class="card">
+              <div class="pin-toolbar">
+                <h3>Swipe outfit pins</h3>
+                <label class="toggle">
+                  <input type="checkbox" id="pin-autoplay" />
+                  <span>Auto swipe</span>
+                </label>
+              </div>
+              <div class="pin-swipe">
+                <button class="ghost" id="pin-prev">◀</button>
+                <div class="pin-frame" id="pin-frame"></div>
+                <button class="ghost" id="pin-next">▶</button>
+              </div>
+              <div class="pin-actions">
+                <button class="secondary" id="pin-like">Save pin</button>
+                <p class="muted" id="pin-count">0 pins saved</p>
+              </div>
+            </div>
           </div>
-          <div class="card">
-            <h2>Your custom pins</h2>
-            <div class="pin-grid" id="custom-pin-grid"></div>
+        </section>
+
+        <section class="panel" id="calendar">
+          <div class="panel-header">
+            <div>
+              <h2>Outfit calendar</h2>
+              <p>Plan ahead or generate a new outfit for each day.</p>
+            </div>
           </div>
-        </div>
-      </section>
+          <div class="panel-grid">
+            <div class="card">
+              <h3>Week view</h3>
+              <div class="calendar-grid" id="calendar-grid"></div>
+            </div>
+            <div class="card">
+              <h3>Planned outfits</h3>
+              <div class="planned-grid" id="planned-grid"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="create">
+          <div class="panel-header">
+            <div>
+              <h2>Manual outfit builder</h2>
+              <p>Create your own outfit pins by selecting wardrobe pieces.</p>
+            </div>
+          </div>
+          <div class="panel-grid">
+            <div class="card">
+              <h3>Create your own outfit pin</h3>
+              <div class="create-controls">
+                <label>
+                  Outfit title
+                  <input type="text" id="custom-title" placeholder="Night out" />
+                </label>
+                <label>
+                  Notes
+                  <input
+                    type="text"
+                    id="custom-notes"
+                    placeholder="e.g. monochrome, sleek accessories"
+                  />
+                </label>
+              </div>
+              <div class="wardrobe-select" id="wardrobe-select"></div>
+              <button class="primary" id="create-pin">Create pin</button>
+            </div>
+            <div class="card">
+              <h3>Your custom pins</h3>
+              <div class="pin-grid" id="custom-pin-grid"></div>
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
 
     <div class="modal hidden" id="preference-modal">

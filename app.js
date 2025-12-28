@@ -1,7 +1,7 @@
-const tabs = document.querySelectorAll(".tab");
-const panels = document.querySelectorAll(".tab-panel");
+const navLinks = document.querySelectorAll(".nav-link");
+const jumpPins = document.getElementById("jump-pins");
+const globalSearch = document.querySelector(".global-search");
 const preferenceModal = document.getElementById("preference-modal");
-const swipeCard = document.getElementById("swipe-card");
 const swipeImage = document.getElementById("swipe-image");
 const swipeName = document.getElementById("swipe-name");
 const swipeTags = document.getElementById("swipe-tags");
@@ -15,12 +15,20 @@ const webSearchBtn = document.getElementById("web-search-btn");
 const webResults = document.getElementById("web-results");
 const addItemBtn = document.getElementById("add-item");
 const skipItemBtn = document.getElementById("skip-item");
+const wardrobeSearch = document.getElementById("wardrobe-search");
+const wardrobeFilterColor = document.getElementById("wardrobe-filter-color");
+const wardrobeFilterCategory = document.getElementById("wardrobe-filter-category");
 const boardSelect = document.getElementById("board-select");
 const styleNotes = document.getElementById("style-notes");
+const styleIntensity = document.getElementById("style-intensity");
+const intensityLabel = document.getElementById("intensity-label");
 const generatePinsBtn = document.getElementById("generate-pins");
 const pinFrame = document.getElementById("pin-frame");
 const pinPrev = document.getElementById("pin-prev");
 const pinNext = document.getElementById("pin-next");
+const pinAutoplay = document.getElementById("pin-autoplay");
+const pinLike = document.getElementById("pin-like");
+const pinCount = document.getElementById("pin-count");
 const calendarGrid = document.getElementById("calendar-grid");
 const plannedGrid = document.getElementById("planned-grid");
 const calendarModal = document.getElementById("calendar-modal");
@@ -43,12 +51,14 @@ const wardrobeItems = [];
 const generatedPins = [];
 const customPins = [];
 const plannedPins = {};
+const savedPins = [];
 let preference = "feminine";
 let swipeIndex = 0;
 let pinIndex = 0;
 let calendarPinIndex = 0;
 let activeCalendarDay = null;
 let calendarPins = [];
+let autoplayTimer = null;
 const selectedWardrobeIds = new Set();
 
 const suggestedItems = {
@@ -65,14 +75,14 @@ const suggestedItems = {
       color: "brown",
       category: "bottom",
       image:
-        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=600&q=80",
+        "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=600&q=80",
     },
     {
       name: "Leather boots",
       color: "black",
       category: "shoe",
       image:
-        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=600&q=80",
+        "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&w=600&q=80",
     },
     {
       name: "Brown leather jacket",
@@ -95,14 +105,14 @@ const suggestedItems = {
       color: "blue",
       category: "bottom",
       image:
-        "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80",
+        "https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=600&q=80",
     },
     {
       name: "Ribbed tee",
       color: "white",
       category: "top",
       image:
-        "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=600&q=80",
+        "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=600&q=80",
     },
   ],
 };
@@ -112,6 +122,14 @@ const boardStyles = {
   minimal: "Minimal city",
   maximalist: "Maximalist glam",
   coastal: "Coastal linen",
+};
+
+const intensityLabels = {
+  1: "Soft",
+  2: "Classic",
+  3: "Balanced",
+  4: "Bold",
+  5: "Statement",
 };
 
 const weekdays = [
@@ -138,9 +156,33 @@ const assetForQuery = (query) =>
 
 const formatTags = (item) => `${item.color} · ${item.category}`;
 
+const updateIntensityLabel = () => {
+  intensityLabel.textContent = intensityLabels[styleIntensity.value];
+};
+
+const getFilteredWardrobe = () => {
+  const searchTerm = wardrobeSearch.value.trim().toLowerCase();
+  const color = wardrobeFilterColor.value;
+  const category = wardrobeFilterCategory.value;
+  return wardrobeItems.filter((item) => {
+    const matchesSearch =
+      !searchTerm || item.name.toLowerCase().includes(searchTerm);
+    const matchesColor = color === "all" || item.color === color;
+    const matchesCategory =
+      category === "all" || item.category === category;
+    return matchesSearch && matchesColor && matchesCategory;
+  });
+};
+
 const renderWardrobe = () => {
   wardrobeGrid.innerHTML = "";
-  wardrobeItems.forEach((item) => {
+  const filtered = getFilteredWardrobe();
+  if (!filtered.length) {
+    wardrobeGrid.innerHTML =
+      "<p class=\"muted\">No items yet. Upload or add from the web.</p>";
+    return;
+  }
+  filtered.forEach((item) => {
     const card = document.createElement("div");
     card.className = "wardrobe-item";
     card.innerHTML = `
@@ -265,7 +307,7 @@ const renderPin = (pin) => `
 const renderPinFrame = () => {
   if (generatedPins.length === 0) {
     pinFrame.innerHTML =
-      "<p>Add wardrobe items to generate Pinterest-style outfit pins.</p>";
+      "<p class=\"muted\">Add wardrobe items to generate outfit pins.</p>";
     return;
   }
   pinFrame.innerHTML = renderPin(generatedPins[pinIndex]);
@@ -274,7 +316,7 @@ const renderPinFrame = () => {
 const renderCalendarPins = () => {
   if (!calendarPins.length) {
     calendarPinFrame.innerHTML =
-      "<p>Generate outfits to preview options for this day.</p>";
+      "<p class=\"muted\">Generate outfits to preview options for this day.</p>";
     return;
   }
   calendarPinFrame.innerHTML = renderPin(calendarPins[calendarPinIndex]);
@@ -296,6 +338,9 @@ const renderCalendar = () => {
   weekdays.forEach((day) => {
     const tile = document.createElement("div");
     tile.className = "calendar-day";
+    if (activeCalendarDay === day) {
+      tile.classList.add("active");
+    }
     tile.innerHTML = `
       <strong>${day}</strong>
       <span>${plannedPins[day] ? "Outfit planned" : "Plan outfit"}</span>
@@ -307,6 +352,7 @@ const renderCalendar = () => {
       calendarPins = [];
       calendarPinIndex = 0;
       renderCalendarPins();
+      renderCalendar();
     });
     calendarGrid.appendChild(tile);
   });
@@ -321,13 +367,42 @@ const renderCustomPins = () => {
   });
 };
 
-tabs.forEach((tab) => {
-  tab.addEventListener("click", () => {
-    tabs.forEach((btn) => btn.classList.remove("active"));
-    panels.forEach((panel) => panel.classList.remove("active"));
-    tab.classList.add("active");
-    document.getElementById(tab.dataset.tab).classList.add("active");
+const updateSavedPins = () => {
+  pinCount.textContent = `${savedPins.length} pins saved`;
+};
+
+const stopAutoplay = () => {
+  if (autoplayTimer) {
+    clearInterval(autoplayTimer);
+    autoplayTimer = null;
+  }
+};
+
+const startAutoplay = () => {
+  stopAutoplay();
+  autoplayTimer = setInterval(() => {
+    if (!generatedPins.length) return;
+    pinIndex = (pinIndex + 1) % generatedPins.length;
+    renderPinFrame();
+  }, 2200);
+};
+
+navLinks.forEach((link) => {
+  link.addEventListener("click", () => {
+    navLinks.forEach((item) => item.classList.remove("active"));
+    link.classList.add("active");
+    const target = document.getElementById(link.dataset.section);
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
   });
+});
+
+jumpPins.addEventListener("click", () => {
+  document.getElementById("pins").scrollIntoView({ behavior: "smooth" });
+});
+
+globalSearch.addEventListener("input", (event) => {
+  wardrobeSearch.value = event.target.value;
+  renderWardrobe();
 });
 
 document.querySelectorAll("[data-preference]").forEach((button) => {
@@ -363,20 +438,26 @@ webSearchBtn.addEventListener("click", () =>
   renderWebResults(webSearchInput.value.trim())
 );
 
+[wardrobeSearch, wardrobeFilterColor, wardrobeFilterCategory].forEach(
+  (element) => {
+    element.addEventListener("input", renderWardrobe);
+  }
+);
+
 addItemBtn.addEventListener("click", () => nextSwipe(true));
 skipItemBtn.addEventListener("click", () => nextSwipe(false));
+
+styleIntensity.addEventListener("input", updateIntensityLabel);
 
 generatePinsBtn.addEventListener("click", () => {
   const boardKey = boardSelect.value;
   generatedPins.length = 0;
+  const intensity = intensityLabels[styleIntensity.value];
+  const notes = [styleNotes.value.trim(), `Mood: ${intensity}`]
+    .filter(Boolean)
+    .join(" · ");
   for (let i = 0; i < 5; i += 1) {
-    generatedPins.push(
-      generatePin(
-        `Outfit Pin ${i + 1}`,
-        styleNotes.value.trim(),
-        boardKey
-      )
-    );
+    generatedPins.push(generatePin(`Outfit Pin ${i + 1}`, notes, boardKey));
   }
   pinIndex = 0;
   renderPinFrame();
@@ -392,6 +473,23 @@ pinNext.addEventListener("click", () => {
   if (!generatedPins.length) return;
   pinIndex = (pinIndex + 1) % generatedPins.length;
   renderPinFrame();
+});
+
+pinAutoplay.addEventListener("change", (event) => {
+  if (event.target.checked) {
+    startAutoplay();
+  } else {
+    stopAutoplay();
+  }
+});
+
+pinLike.addEventListener("click", () => {
+  if (!generatedPins.length) return;
+  const pin = generatedPins[pinIndex];
+  if (!savedPins.find((item) => item.id === pin.id)) {
+    savedPins.push(pin);
+    updateSavedPins();
+  }
 });
 
 calendarCancel.addEventListener("click", () => {
@@ -453,6 +551,17 @@ createPinBtn.addEventListener("click", () => {
   renderCustomPins();
 });
 
+window.addEventListener("keydown", (event) => {
+  if (event.key === "ArrowLeft") {
+    nextSwipe(false);
+  }
+  if (event.key === "ArrowRight") {
+    nextSwipe(true);
+  }
+});
+
 renderWebResults("");
 renderCalendar();
+updateIntensityLabel();
+updateSavedPins();
 showSwipeItem();
