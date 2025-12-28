@@ -1,0 +1,275 @@
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/index.html b/index.html
+new file mode 100644
+index 0000000000000000000000000000000000000000..4f18a8228315bb4544d2a0289dfbb8c53f984e5a
+--- /dev/null
++++ b/index.html
+@@ -0,0 +1,265 @@
++<!DOCTYPE html>
++<html lang="en">
++  <head>
++    <meta charset="UTF-8" />
++    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++    <title>PinWardrobe Studio</title>
++    <link rel="stylesheet" href="styles.css" />
++    <link
++      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap"
++      rel="stylesheet"
++    />
++  </head>
++  <body>
++    <div class="app">
++      <header class="hero">
++        <div>
++          <p class="eyebrow">Wardrobe + Pinterest inspiration</p>
++          <h1>PinWardrobe Studio</h1>
++          <p class="subtitle">
++            Upload your closet, remix Pinterest-inspired looks, and plan outfits
++            on a calendar.
++          </p>
++        </div>
++        <nav class="nav-tabs">
++          <button class="tab active" data-tab="wardrobe">Wardrobe</button>
++          <button class="tab" data-tab="pins">Generate Pins</button>
++          <button class="tab" data-tab="calendar">Calendar Plan</button>
++          <button class="tab" data-tab="create">Create Outfit</button>
++        </nav>
++      </header>
++
++      <section class="tab-panel active" id="wardrobe">
++        <div class="panel-grid">
++          <div class="card">
++            <h2>Upload wardrobe</h2>
++            <p>
++              Add multiple items at once. Confirm accurate color + category tags
++              so outfits stay consistent.
++            </p>
++            <div class="upload-zone">
++              <input
++                type="file"
++                id="upload-input"
++                multiple
++                accept="image/*"
++              />
++              <button class="primary" id="upload-trigger">
++                Upload images
++              </button>
++              <span class="hint">PNG, JPG, WebP supported.</span>
++            </div>
++            <div class="tag-selectors">
++              <label>
++                Category
++                <select id="upload-category">
++                  <option value="top">Top</option>
++                  <option value="bottom">Bottom</option>
++                  <option value="dress">Dress</option>
++                  <option value="outerwear">Outerwear</option>
++                  <option value="shoe">Shoes</option>
++                  <option value="accessory">Accessory</option>
++                </select>
++              </label>
++              <label>
++                Color
++                <select id="upload-color">
++                  <option value="black">Black</option>
++                  <option value="white">White</option>
++                  <option value="cream">Cream</option>
++                  <option value="brown">Brown</option>
++                  <option value="tan">Tan</option>
++                  <option value="red">Red</option>
++                  <option value="blue">Blue</option>
++                  <option value="green">Green</option>
++                  <option value="pink">Pink</option>
++                  <option value="metallic">Metallic</option>
++                </select>
++              </label>
++            </div>
++          </div>
++
++          <div class="card">
++            <h2>Search the web</h2>
++            <p>
++              Find inspiration pieces online and save them directly to your
++              wardrobe.
++            </p>
++            <div class="search-row">
++              <input
++                type="text"
++                id="web-search"
++                placeholder="Search web: 'brown leather jacket'"
++              />
++              <button class="secondary" id="web-search-btn">Search</button>
++            </div>
++            <div class="web-results" id="web-results"></div>
++          </div>
++        </div>
++
++        <div class="card">
++          <div class="section-header">
++            <div>
++              <h2>Swipe through closet finds</h2>
++              <p>
++                Swipe (or tap) left/right to add items to your wardrobe list.
++              </p>
++            </div>
++            <div class="swipe-actions">
++              <button class="ghost" id="skip-item">Skip</button>
++              <button class="primary" id="add-item">Add to wardrobe</button>
++            </div>
++          </div>
++          <div class="swipe-card" id="swipe-card">
++            <img src="" alt="Suggested item" id="swipe-image" />
++            <div class="swipe-meta">
++              <span id="swipe-name"></span>
++              <span class="pill" id="swipe-tags"></span>
++            </div>
++          </div>
++        </div>
++
++        <div class="card">
++          <h2>Your wardrobe</h2>
++          <div class="wardrobe-grid" id="wardrobe-grid"></div>
++        </div>
++      </section>
++
++      <section class="tab-panel" id="pins">
++        <div class="panel-grid">
++          <div class="card">
++            <h2>Generate outfit pins</h2>
++            <p>
++              Select a Pinterest board style, then remix outfits from your
++              wardrobe.
++            </p>
++            <label>
++              Inspiration board
++              <select id="board-select">
++                <option value="london">London girl</option>
++                <option value="minimal">Minimal city</option>
++                <option value="maximalist">Maximalist glam</option>
++                <option value="coastal">Coastal linen</option>
++              </select>
++            </label>
++            <label>
++              Style direction
++              <input
++                type="text"
++                id="style-notes"
++                placeholder="e.g. espresso tones, chunky jewelry"
++              />
++            </label>
++            <button class="primary" id="generate-pins">Generate pins</button>
++          </div>
++          <div class="card">
++            <h2>Swipe outfit pins</h2>
++            <p>Tap the arrows to swipe through your generated pins.</p>
++            <div class="pin-swipe">
++              <button class="ghost" id="pin-prev">◀</button>
++              <div class="pin-frame" id="pin-frame"></div>
++              <button class="ghost" id="pin-next">▶</button>
++            </div>
++          </div>
++        </div>
++      </section>
++
++      <section class="tab-panel" id="calendar">
++        <div class="card">
++          <h2>Calendar outfit plan</h2>
++          <p>
++            Plan outfits in advance using saved pins or generate a new look for
++            each day.
++          </p>
++          <div class="calendar-grid" id="calendar-grid"></div>
++        </div>
++        <div class="card">
++          <h2>Planned outfits</h2>
++          <div class="planned-grid" id="planned-grid"></div>
++        </div>
++      </section>
++
++      <section class="tab-panel" id="create">
++        <div class="panel-grid">
++          <div class="card">
++            <h2>Create your own outfit pin</h2>
++            <p>Pick pieces from your closet to build a custom pin.</p>
++            <div class="create-controls">
++              <label>
++                Outfit title
++                <input type="text" id="custom-title" placeholder="Night out" />
++              </label>
++              <label>
++                Notes
++                <input
++                  type="text"
++                  id="custom-notes"
++                  placeholder="e.g. monochrome, sleek accessories"
++                />
++              </label>
++            </div>
++            <div class="wardrobe-select" id="wardrobe-select"></div>
++            <button class="primary" id="create-pin">Create pin</button>
++          </div>
++          <div class="card">
++            <h2>Your custom pins</h2>
++            <div class="pin-grid" id="custom-pin-grid"></div>
++          </div>
++        </div>
++      </section>
++    </div>
++
++    <div class="modal hidden" id="preference-modal">
++      <div class="modal-content">
++        <h2>Pick your style direction</h2>
++        <p>
++          Do you prefer feminine or masculine clothing? We'll suggest pieces to
++          add to your wardrobe.
++        </p>
++        <div class="modal-actions">
++          <button class="primary" data-preference="feminine">Feminine</button>
++          <button class="secondary" data-preference="masculine">Masculine</button>
++        </div>
++      </div>
++    </div>
++
++    <div class="modal hidden" id="calendar-modal">
++      <div class="modal-content">
++        <h2 id="calendar-title">Plan for Tuesday</h2>
++        <label>
++          Inspiration board
++          <select id="calendar-board">
++            <option value="london">London girl</option>
++            <option value="minimal">Minimal city</option>
++            <option value="maximalist">Maximalist glam</option>
++            <option value="coastal">Coastal linen</option>
++          </select>
++        </label>
++        <label>
++          Style request
++          <input
++            type="text"
++            id="calendar-request"
++            placeholder="simple outfit, maximalist glam..."
++          />
++        </label>
++        <div class="modal-actions">
++          <button class="secondary" id="calendar-cancel">Cancel</button>
++          <button class="primary" id="calendar-generate">
++            Generate outfit pins
++          </button>
++        </div>
++        <div class="pin-swipe calendar-swipe">
++          <button class="ghost" id="calendar-prev">◀</button>
++          <div class="pin-frame" id="calendar-pin-frame"></div>
++          <button class="ghost" id="calendar-next">▶</button>
++        </div>
++        <button class="primary full" id="calendar-select">
++          Select outfit for day
++        </button>
++      </div>
++    </div>
++
++    <script src="app.js"></script>
++  </body>
++</html>
+ 
+EOF
+)
