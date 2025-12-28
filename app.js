@@ -2,6 +2,10 @@ const navLinks = document.querySelectorAll(".nav-link");
 const jumpPins = document.getElementById("jump-pins");
 const globalSearch = document.querySelector(".global-search");
 const preferenceModal = document.getElementById("preference-modal");
+const boardUrlInput = document.getElementById("board-url");
+const boardVibeInput = document.getElementById("board-vibe");
+const boardSave = document.getElementById("board-save");
+const boardStatus = document.getElementById("board-status");
 const swipeImage = document.getElementById("swipe-image");
 const swipeName = document.getElementById("swipe-name");
 const swipeTags = document.getElementById("swipe-tags");
@@ -59,6 +63,8 @@ let calendarPinIndex = 0;
 let activeCalendarDay = null;
 let calendarPins = [];
 let autoplayTimer = null;
+let inspirationBoardUrl = "";
+let inspirationBoardVibe = "";
 const selectedWardrobeIds = new Set();
 
 const suggestedItems = {
@@ -156,6 +162,92 @@ const assetForQuery = (query) =>
 
 const formatTags = (item) => `${item.color} · ${item.category}`;
 
+const colorKeywords = [
+  { key: "black", value: "black" },
+  { key: "white", value: "white" },
+  { key: "cream", value: "cream" },
+  { key: "ivory", value: "cream" },
+  { key: "beige", value: "tan" },
+  { key: "tan", value: "tan" },
+  { key: "brown", value: "brown" },
+  { key: "camel", value: "tan" },
+  { key: "red", value: "red" },
+  { key: "burgundy", value: "red" },
+  { key: "blue", value: "blue" },
+  { key: "navy", value: "blue" },
+  { key: "green", value: "green" },
+  { key: "olive", value: "green" },
+  { key: "pink", value: "pink" },
+  { key: "metallic", value: "metallic" },
+  { key: "gold", value: "metallic" },
+  { key: "silver", value: "metallic" },
+  { key: "neutral", value: "neutral" },
+];
+
+const categoryKeywords = [
+  { key: "coat", value: "outerwear" },
+  { key: "jacket", value: "outerwear" },
+  { key: "blazer", value: "outerwear" },
+  { key: "trench", value: "outerwear" },
+  { key: "parka", value: "outerwear" },
+  { key: "dress", value: "dress" },
+  { key: "skirt", value: "bottom" },
+  { key: "pants", value: "bottom" },
+  { key: "trouser", value: "bottom" },
+  { key: "jean", value: "bottom" },
+  { key: "short", value: "bottom" },
+  { key: "top", value: "top" },
+  { key: "shirt", value: "top" },
+  { key: "blouse", value: "top" },
+  { key: "tee", value: "top" },
+  { key: "tank", value: "top" },
+  { key: "sweater", value: "top" },
+  { key: "knit", value: "top" },
+  { key: "shoe", value: "shoe" },
+  { key: "boot", value: "shoe" },
+  { key: "heel", value: "shoe" },
+  { key: "sneaker", value: "shoe" },
+  { key: "loafer", value: "shoe" },
+  { key: "bag", value: "accessory" },
+  { key: "purse", value: "accessory" },
+  { key: "tote", value: "accessory" },
+  { key: "jewelry", value: "accessory" },
+  { key: "belt", value: "accessory" },
+  { key: "hat", value: "accessory" },
+];
+
+const inferColor = (text) => {
+  const normalized = text.toLowerCase();
+  const match = colorKeywords.find((color) =>
+    normalized.includes(color.key)
+  );
+  return match ? match.value : "neutral";
+};
+
+const inferCategory = (text) => {
+  const normalized = text.toLowerCase();
+  const match = categoryKeywords.find((category) =>
+    normalized.includes(category.key)
+  );
+  return match ? match.value : "accessory";
+};
+
+const resolveLabel = (value, fallback) =>
+  value === "auto" ? fallback : value;
+
+const applyAutoLabels = (text, colorValue, categoryValue) => ({
+  color: resolveLabel(colorValue, inferColor(text)),
+  category: resolveLabel(categoryValue, inferCategory(text)),
+});
+
+const updateBoardStatus = () => {
+  if (!inspirationBoardUrl) {
+    boardStatus.textContent = "No board saved yet.";
+    return;
+  }
+  boardStatus.textContent = `Using board: ${inspirationBoardUrl}`;
+};
+
 const updateIntensityLabel = () => {
   intensityLabel.textContent = intensityLabels[styleIntensity.value];
 };
@@ -244,10 +336,11 @@ const renderWebResults = (query) => {
   webResults.innerHTML = "";
   const tokens = query ? [query] : webSearchFallback;
   tokens.slice(0, 6).forEach((term, index) => {
+    const labels = applyAutoLabels(term, uploadColor.value, uploadCategory.value);
     const item = {
       name: term,
-      color: uploadColor.value,
-      category: uploadCategory.value,
+      color: labels.color,
+      category: labels.category,
       image: assetForQuery(term),
     };
     const card = document.createElement("div");
@@ -268,18 +361,37 @@ const renderWebResults = (query) => {
   });
 };
 
+const pickItem = (items, desiredCategories) => {
+  const found = items.find((item) =>
+    desiredCategories.includes(item.category)
+  );
+  if (found) return found;
+  return items[Math.floor(Math.random() * items.length)];
+};
+
+const buildPinLayout = (items) => ({
+  top: pickItem(items, ["top", "dress"]),
+  bottom: pickItem(items, ["bottom"]),
+  outerwear: pickItem(items, ["outerwear"]),
+  bag: pickItem(items, ["accessory"]),
+  shoes: pickItem(items, ["shoe"]),
+});
+
 const generatePin = (source, notes = "", boardKey) => {
   const items = wardrobeItems.length
     ? wardrobeItems
     : suggestedItems[preference];
   const shuffled = items.slice().sort(() => 0.5 - Math.random());
   const collage = shuffled.slice(0, 6);
+  const layout = buildPinLayout(shuffled);
   return {
     id: `${Date.now()}-${Math.random()}`,
     title: source,
-    board: boardStyles[boardKey] || boardStyles.london,
+    board: inspirationBoardVibe || boardStyles[boardKey] || boardStyles.london,
+    boardUrl: inspirationBoardUrl,
     notes,
     collage,
+    layout,
   };
 };
 
@@ -287,15 +399,37 @@ const renderPin = (pin) => `
   <div class="pin">
     <div class="pin-header">
       <span>${pin.title}</span>
-      <span class="pin-board">${pin.board}</span>
+      <span class="pin-board">${pin.board}${
+        pin.boardUrl ? " · Pinterest" : ""
+      }</span>
     </div>
-    <div class="pin-collage">
-      ${pin.collage
-        .map(
-          (item) =>
-            `<img src="${item.image}" alt="${item.name}" loading="lazy" />`
-        )
-        .join("")}
+    <div class="pin-layout">
+      <div class="pin-column">
+        <div class="pin-slot top">
+          <img src="${pin.layout.top.image}" alt="${pin.layout.top.name}" loading="lazy" />
+          <span>Top</span>
+        </div>
+        <div class="pin-slot bottom">
+          <img src="${pin.layout.bottom.image}" alt="${pin.layout.bottom.name}" loading="lazy" />
+          <span>Bottoms</span>
+        </div>
+      </div>
+      <div class="pin-column">
+        <div class="pin-slot outerwear">
+          <img src="${pin.layout.outerwear.image}" alt="${pin.layout.outerwear.name}" loading="lazy" />
+          <span>Outerwear</span>
+        </div>
+        <div class="pin-slot accessories">
+          <div class="mini">
+            <img src="${pin.layout.bag.image}" alt="${pin.layout.bag.name}" loading="lazy" />
+            <span>Bag</span>
+          </div>
+          <div class="mini">
+            <img src="${pin.layout.shoes.image}" alt="${pin.layout.shoes.name}" loading="lazy" />
+            <span>Shoes</span>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="pin-footer">
       <span>${pin.notes || "Wardrobe remixed pin"}</span>
@@ -414,6 +548,12 @@ document.querySelectorAll("[data-preference]").forEach((button) => {
   });
 });
 
+boardSave.addEventListener("click", () => {
+  inspirationBoardUrl = boardUrlInput.value.trim();
+  inspirationBoardVibe = boardVibeInput.value.trim();
+  updateBoardStatus();
+});
+
 uploadTrigger.addEventListener("click", () => uploadInput.click());
 
 uploadInput.addEventListener("change", (event) => {
@@ -422,10 +562,15 @@ uploadInput.addEventListener("change", (event) => {
   files.forEach((file) => {
     const reader = new FileReader();
     reader.onload = (uploadEvent) => {
+      const labels = applyAutoLabels(
+        file.name,
+        uploadColor.value,
+        uploadCategory.value
+      );
       addItemToWardrobe({
         name: file.name.replace(/\.[^/.]+$/, ""),
-        color: uploadColor.value,
-        category: uploadCategory.value,
+        color: labels.color,
+        category: labels.category,
         image: uploadEvent.target.result,
       });
     };
@@ -544,6 +689,7 @@ createPinBtn.addEventListener("click", () => {
     board: "Custom pin",
     notes: customNotes.value.trim(),
     collage: selected,
+    layout: buildPinLayout(selected),
   };
   customPins.push(pin);
   selectedWardrobeIds.clear();
@@ -562,6 +708,7 @@ window.addEventListener("keydown", (event) => {
 
 renderWebResults("");
 renderCalendar();
+updateBoardStatus();
 updateIntensityLabel();
 updateSavedPins();
 showSwipeItem();

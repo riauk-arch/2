@@ -383,17 +383,87 @@ button.ghost {
   font-size: 12px;
 }
 
-.pin-collage {
+.pin-layout {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 12px;
+  min-height: 260px;
 }
 
-.pin-collage img {
+.pin-column {
+  display: grid;
+  gap: 10px;
+}
+
+.pin-slot {
+  border-radius: 18px;
+  background: #f2ece7;
+  overflow: hidden;
+  position: relative;
+}
+
+.pin-slot img {
   width: 100%;
-  border-radius: 14px;
+  height: 100%;
   object-fit: cover;
-  height: 110px;
+  display: block;
+}
+
+.pin-slot span {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(27, 27, 27, 0.7);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  text-transform: capitalize;
+}
+
+.pin-slot.top {
+  min-height: 150px;
+}
+
+.pin-slot.bottom {
+  min-height: 110px;
+}
+
+.pin-slot.outerwear {
+  min-height: 200px;
+}
+
+.pin-slot.accessories {
+  min-height: 120px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 8px;
+}
+
+.pin-slot.accessories .mini {
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  min-height: 80px;
+}
+
+.pin-slot.accessories .mini img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pin-slot.accessories .mini span {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  background: rgba(27, 27, 27, 0.7);
+  color: #fff;
+  padding: 3px 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  text-transform: capitalize;
 }
 
 .pin-footer {
